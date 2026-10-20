@@ -1,19 +1,29 @@
-# Checkpoint A - @kharishan
+# Checkpoint A - kharishan
 
-Équipe G03 / T10 · Repo `esilv-marketpulse-g03-t10`
-
-## Captures
-
-| Fichier | Contenu |
-|---|---|
-| `01_terminal_python.png` | MarketPulse lancé depuis la racine du repo |
-| `02_git_status_log.png` | état Git et historique local |
-| `03_branch_merge.png` | branche `feature/display-observation-dates` fusionnée dans `main` |
+**Team:** G03 - T10 · **Repository:** `esilv-marketpulse-g03-t10`
 
 ## TD04 - Branches + Merge
 
-- Branche créée : `feature/display-observation-dates`
-- Fonctionnalité : affichage de la première et de la dernière date des observations
-- Commit : `feat: display first and last observation dates`
-- Merge dans `main` en **fast-forward** (main n'avait pas bougé depuis la création de la branche)
-- Branche supprimée après le merge, le commit reste dans l'historique
+### What I did
+
+- Started from a clean `main` branch, up to date with `origin/main`.
+- Created the branch `feature/display-observation-dates` and implemented `get_first_date` and `get_last_date` to display the first and last observation dates for the instrument and the benchmark.
+- Committed the feature on the branch: `7aa42e7 feat: display first and last observation dates`.
+- Compared the branch with `main` using `git diff main..feature/display-observation-dates` and `git log --oneline --graph --decorate --all`.
+- Switched back to `main` and merged the branch: Git performed a fast-forward.
+- Captured `03_branch_merge.png`, then deleted the merged branch with `git branch -d`.
+
+### What I understood
+
+- A branch isolates work: before the merge, `main` did not display the dates.
+- Fast-forward: `main` had not moved since the branch was created, so Git only moved the `main` pointer to my commit, without a merge commit.
+- Deleting a merged branch removes the label only; the commit stays in the history of `main`.
+- A merge conflict happens when two branches change the same lines; a human must choose the final content, remove the markers, then `git add` and commit.
+
+## Evidence
+
+| File | Content |
+|---|---|
+| `01_terminal_python.png` | MarketPulse running from the repository root, with the dates |
+| `02_git_status_log.png` | Git status and local history |
+| `03_branch_merge.png` | Feature branch merged into `main` (fast-forward) |
