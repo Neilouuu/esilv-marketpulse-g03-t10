@@ -2,8 +2,7 @@
 
 
 def index_by_date(prices):
-    raise NotImplementedError  # Student 2 (timeo-b)
-
+    return {row["date"]: row for row in prices}
 
 def align_series(inst_prices, benchmark_prices):
     inst_by_date = index_by_date(inst_prices)
@@ -18,7 +17,16 @@ def align_series(inst_prices, benchmark_prices):
 
 
 def calculate_period_return(prices):
-    raise NotImplementedError  # Student 2 (timeo-b)
+    if not prices:
+        raise ValueError("Cannot compute a return on an empty series")
+
+    first_close = float(prices[0]["close"])
+    last_close = float(prices[-1]["close"])
+
+    if first_close == 0:
+        raise ValueError("First close is zero: return is undefined")
+
+    return ((last_close / first_close) - 1.0) * 100.0
 
 
 def calculate_base_100(prices):
