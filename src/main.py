@@ -61,7 +61,7 @@ def main():
     instrument_prices = filter_prices(prices, instrument["ticker"])
     benchmark_prices = filter_prices(prices, benchmark["ticker"])
 
-    print("=== MarketPulse ===")
+    print("=== MarketPulse - Instrument vs Benchmark ===")
     print()
     print("Market configuration")
     print(f"Period   : {LOOKBACK_LABEL}")
@@ -76,4 +76,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
