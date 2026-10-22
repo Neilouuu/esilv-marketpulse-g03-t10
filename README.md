@@ -204,6 +204,46 @@ These are the two canonical CORE runtime commands.
 
 The instructor starter repository does not necessarily contain every later-stage student file on day one. Files appear progressively during the lab sequence.
 
+## Quick start
+
+Open a terminal at the **root of the repository** (in Codespaces: `/workspaces/esilv-marketpulse-g03-t10`), then run:
+
+```bash
+python src/main.py
+```
+
+Expected output at the current stage:
+
+```text
+=== MarketPulse ===
+
+Market configuration
+Period   : 1 month
+Interval : Daily
+
+Instrument
+AAPL - Apple Inc.
+Observations : 21
+First date   : 2026-09-01
+Last date    : 2026-09-30
+First close  : 250.00 USD
+Last close   : 266.20 USD
+
+Benchmark
+SP500 - S&P 500
+Observations : 21
+First date   : 2026-09-01
+Last date    : 2026-09-30
+First close  : 6600.00
+Last close   : 6742.00
+```
+
+**Common error:** `can't open file '.../src/main.py'` means the command was not run from the repository root. Run `pwd` to check where you are, then go back with:
+
+```bash
+cd /workspaces/esilv-marketpulse-g03-t10
+```
+
 ## Installation
 
 The starter TD01-TD02 path uses only the Python standard library.
