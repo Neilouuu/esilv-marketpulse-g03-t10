@@ -2,9 +2,9 @@
 
 - Name: Harishan KONESWARAN
 - GitHub: @kharishan
-- Branch: feature/yahoo-provider
-- Main commit: 833db09
-- Pull Request: #5
+- Branch: feature/analytics
+- Main commit: 3f249ad
+- Pull Request: #4
 - Reviewed Pull Request: #3
 
 ## Evidence
