@@ -3,6 +3,8 @@ import csv
 import json
 import sys
 
+# "python src/main.py" puts src/ (not the repository root) on sys.path.
+# Add the repository root so that "from src.analytics import ..." works.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.analytics import (
@@ -12,15 +14,17 @@ from src.analytics import (
     calculate_relative_performance,
 )
 from src.providers.yahoo_provider import fetch_yahoo_prices
-from src.providers.bloomberg_provider import ACCESS_MODE, fetch_bloomberg_prices
 
 
 DATA_DIR = Path("data/sample")
 
+# These starter values mirror config/settings.yml.
+# settings.yml is a human-readable configuration contract in the CORE.
+# Parsing YAML is optional and is not required by the 18-hour lab sequence.
 LOOKBACK_LABEL = "1 month"
 INTERVAL_LABEL = "Daily"
 
-PROVIDER = "bloomberg"  # "bloomberg", "yahoo" or "csv"
+PROVIDER = "yahoo"  # "yahoo" or "csv"
 YAHOO_LOOKBACK = "1mo"
 YAHOO_INTERVAL = "1d"
 
@@ -39,80 +43,96 @@ def filter_prices(prices, ticker):
     return [row for row in prices if row["ticker"] == ticker]
 
 
+def get_first_close(prices):
+    return float(prices[0]["close"])
+
+
+def get_last_close(prices):
+    return float(prices[-1]["close"])
+
+def get_first_date(prices):
+    return prices[0]["date"]
+
+
+def get_last_date(prices):
+    return prices[-1]["date"]
+
 def display_market_summary(asset, prices, show_currency=True):
     currency = f" {asset['currency']}" if show_currency else ""
     print(f"{asset['ticker']} - {asset['name']}")
     print(f"Market       : {asset['market']}")
     print(f"Observations : {len(prices)}")
-    print(f"First date   : {prices[0]['date']}")
-    print(f"Last date    : {prices[-1]['date']}")
-    print(f"First close  : {float(prices[0]['close']):.2f}{currency}")
-    print(f"Last close   : {float(prices[-1]['close']):.2f}{currency}")
+    print(f"First date   : {get_first_date(prices)}")
+    print(f"Last date    : {get_last_date(prices)}")
+    print(f"First close  : {get_first_close(prices):.2f}{currency}")
+    print(f"Last close   : {get_last_close(prices):.2f}{currency}")
 
 
-def build_market_snapshot():
+def main():
     instruments = load_instruments()
+
     instrument = instruments["instrument"]
     benchmark = instruments["benchmark"]
 
-    if PROVIDER == "bloomberg":
-        instrument_prices = fetch_bloomberg_prices(instrument["ticker"])
-        benchmark_prices = fetch_bloomberg_prices(benchmark["ticker"])
-    elif PROVIDER == "yahoo":
-        instrument_prices = fetch_yahoo_prices(instrument["ticker"], YAHOO_LOOKBACK, YAHOO_INTERVAL)
-        benchmark_prices = fetch_yahoo_prices(benchmark["ticker"], YAHOO_LOOKBACK, YAHOO_INTERVAL)
+    if PROVIDER == "yahoo":
+        instrument_prices = fetch_yahoo_prices(
+            instrument["ticker"], YAHOO_LOOKBACK, YAHOO_INTERVAL
+        )
+        benchmark_prices = fetch_yahoo_prices(
+            benchmark["ticker"], YAHOO_LOOKBACK, YAHOO_INTERVAL
+        )
     else:
         prices = load_prices()
         instrument_prices = filter_prices(prices, instrument["ticker"])
         benchmark_prices = filter_prices(prices, benchmark["ticker"])
 
-    aligned_instrument, aligned_benchmark = align_series(instrument_prices, benchmark_prices)
-    instrument_return = calculate_period_return(aligned_instrument)
-    benchmark_return = calculate_period_return(aligned_benchmark)
-
-    return {
-        "provider": PROVIDER,
-        "access_mode": ACCESS_MODE if PROVIDER == "bloomberg" else "-",
-        "lookback": LOOKBACK_LABEL,
-        "interval": INTERVAL_LABEL,
-        "instrument": instrument,
-        "benchmark": benchmark,
-        "instrument_prices": instrument_prices,
-        "benchmark_prices": benchmark_prices,
-        "aligned_sessions": len(aligned_instrument),
-        "instrument_return": instrument_return,
-        "benchmark_return": benchmark_return,
-        "relative_performance": calculate_relative_performance(instrument_return, benchmark_return),
-        "instrument_base_100": calculate_base_100(aligned_instrument),
-        "benchmark_base_100": calculate_base_100(aligned_benchmark),
-    }
-
-
-def main():
-    s = build_market_snapshot()
-    inst = s["instrument"]["ticker"]
-    bench = s["benchmark"]["ticker"]
-
     print("=== MarketPulse - Instrument vs Benchmark ===")
     print()
-    print(f"Provider    : {s['provider']}")
-    print(f"Access mode : {s['access_mode']}")
-    print(f"Period      : {s['lookback']}")
-    print(f"Interval    : {s['interval']}")
+    print("Market configuration")
+    print(f"Provider : {PROVIDER}")
+    print(f"Period   : {LOOKBACK_LABEL}")
+    print(f"Interval : {INTERVAL_LABEL}")
     print()
     print("Instrument")
-    display_market_summary(s["instrument"], s["instrument_prices"])
+    display_market_summary(instrument, instrument_prices)
     print()
     print("Benchmark")
-    display_market_summary(s["benchmark"], s["benchmark_prices"], show_currency=False)
-    print()
-    print(f"Aligned sessions     : {s['aligned_sessions']}")
-    print(f"{inst} return          : {s['instrument_return']:+.2f}%")
-    print(f"{bench} return         : {s['benchmark_return']:+.2f}%")
-    print(f"Relative performance : {s['relative_performance']:+.2f} pts")
-    print(f"Base 100 {inst}        : 100.00 -> {s['instrument_base_100'][-1]['value']:.2f}")
-    print(f"Base 100 {bench}       : 100.00 -> {s['benchmark_base_100'][-1]['value']:.2f}")
+    display_market_summary(benchmark, benchmark_prices, show_currency=False)
+    
 
+
+    aligned_instrument, aligned_benchmark = align_series(
+        instrument_prices, benchmark_prices
+    )
+
+    instrument_return = calculate_period_return(aligned_instrument)
+    benchmark_return = calculate_period_return(aligned_benchmark)
+    relative_performance = calculate_relative_performance(
+        instrument_return, benchmark_return
+    )
+
+    instrument_base_100 = calculate_base_100(aligned_instrument)
+    benchmark_base_100 = calculate_base_100(aligned_benchmark)
+
+    instrument_label = instrument["ticker"]
+    benchmark_label = benchmark["ticker"]
+
+    print()
+    print("Comparison (aligned)")
+    print(f"Aligned sessions        : {len(aligned_instrument)}")
+    print(f"{instrument_label + ' period return':<24}: {instrument_return:+.2f}%")
+    print(f"{benchmark_label + ' period return':<24}: {benchmark_return:+.2f}%")
+    print(f"Relative performance    : {relative_performance:+.2f} percentage points")
+    print()
+    print("Base 100")
+    print(
+        f"{instrument_label:<7}: {instrument_base_100[0]['value']:.2f}"
+        f" -> {instrument_base_100[-1]['value']:.2f}"
+    )
+    print(
+        f"{benchmark_label:<7}: {benchmark_base_100[0]['value']:.2f}"
+        f" -> {benchmark_base_100[-1]['value']:.2f}"
+    )
 
 if __name__ == "__main__":
     main()
