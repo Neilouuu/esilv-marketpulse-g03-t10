@@ -1,11 +1,28 @@
 # Checkpoint B
 
+## Student
+
 - Name: Harishan KONESWARAN
 - GitHub: @kharishan
+
+## Contribution
+
 - Branch: feature/yahoo-provider
-- Main commit: bac8672
+- Main commits:
+  - 833db09
 - Pull Request: #5
 - Reviewed Pull Request: #3
+
+## Work completed
+
+Implemented the Yahoo Finance provider with yfinance and connected
+the instrument (AAPL) and benchmark (^GSPC) market data to the
+existing comparison pipeline.
+
+## Main difficulty
+
+Mapping Yahoo symbols (SP500 -> ^GSPC) while keeping the canonical
+tickers used by the analytics functions.
 
 ## Evidence
 

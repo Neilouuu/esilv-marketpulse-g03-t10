@@ -13,7 +13,7 @@ def align_series(inst_prices, benchmark_prices):
     aligned_inst = [inst_by_date[date] for date in common_dates]
     aligned_benchmark = [benchmark_by_date[date] for date in common_dates]
 
-    return aligned_inst, aligned_benchmark # Lead (kharishan)
+    return aligned_inst, aligned_benchmark
 
 
 def calculate_period_return(prices):

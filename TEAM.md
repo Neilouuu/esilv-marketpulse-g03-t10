@@ -17,7 +17,7 @@
 ## Repository
 
 - Team repository: `esilv-marketpulse-g03-t10`
-- Upstream repository: `tawounfouet/esilv-marketpulse`
+- Upstream repository: `plensy/esilv-marketpulse-starter` (fork of `tawounfouet/esilv-marketpulse-starter`)
 
 ## Market choice
 
